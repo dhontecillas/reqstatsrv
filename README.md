@@ -56,7 +56,7 @@ Those are the probability of having a dalay below that "key" milliseconds.
 Example:
 
 | Key | Val  |
-+-----+------+
+|-----|------|
 | 0   | 0.05 |
 | 50  | 0.20 |
 | 150 | 0.0  |
@@ -111,11 +111,11 @@ the content based on the status code.
 Here we define a similar distribution as in the delay part, but
 with the difference that the produced values will not be interpolated.
 
-| Key | Val  |
-+-----+------+
-| 200 | 0.5  |
-| 201 | 0.3  |
-| 204 | 0.2  |
+| Key | Val |
+|-----|-----|
+| 200 | 0.5 |
+| 201 | 0.3 |
+| 204 | 0.2 |
 
 So, with that config, we will have `200` in 50% of the requests, `201` in
 30% of the requests and a `204` in the rest.
