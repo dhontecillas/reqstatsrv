@@ -18,6 +18,7 @@ func main() {
 
 	cfg := config.DefaultConfig()
 	if len(os.Args) > 1 {
+		fmt.Printf("loading from config file %s\n", os.Args[1])
 		fname := os.Args[1]
 		b, err := os.ReadFile(fname)
 		if err != nil {
@@ -30,6 +31,7 @@ func main() {
 			return
 		}
 	}
+	fmt.Printf("config:\n%#v\n", cfg)
 	launchServer(cfg)
 }
 

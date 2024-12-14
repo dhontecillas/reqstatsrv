@@ -27,8 +27,8 @@ func DefaultConfig() *Config {
 					Behaviour{
 						Name: "slower",
 						Config: map[string]interface{}{
-							"freq": 0.5,
-							"seed": 1,
+							"max_bytes_per_second": 1024,
+							"flush_bytes":          1024,
 						},
 					},
 					Behaviour{
@@ -55,6 +55,11 @@ func DefaultConfig() *Config {
 					Source: "directory",
 					Config: map[string]interface{}{
 						"dir": "./example/data",
+						"attempt_extensions": []string{
+							"json",
+							"yaml",
+						},
+						"dunder_querystring": true,
 					},
 				},
 			},
