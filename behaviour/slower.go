@@ -10,6 +10,11 @@ import (
 	"github.com/dhontecillas/reqstatsrv/config"
 )
 
+const (
+	DefaultMaxBytesPerSecond int = 1024 * 1024 * 4
+	DefaultFlushBytes        int = 1024 * 1024
+)
+
 func SlowerBehaviour(next http.Handler, cfg *config.Behaviour) http.Handler {
 	return NewSlower(next, SlowerConfigFromMap(cfg.Config))
 }
@@ -20,7 +25,12 @@ type SlowerConfig struct {
 }
 
 func SlowerConfigFromMap(m map[string]interface{}) *SlowerConfig {
-	var c SlowerConfig
+	// Put some valid default values for the slower config
+	c := SlowerConfig{
+		MaxBytesPerSecond: 1024 * 1024 * 4, // 4 Mb per second
+		FlushBytes:        1024 * 1024,     // flush every Mb
+	}
+
 	b, err := json.Marshal(m)
 	if err != nil {
 		fmt.Printf("error %s converting map %#v to json\n", err.Error(), m)
@@ -30,6 +40,7 @@ func SlowerConfigFromMap(m map[string]interface{}) *SlowerConfig {
 	if err != nil {
 		fmt.Printf("error %s creating config from %s\n", err.Error(), string(b))
 	}
+
 	return &c
 }
 
@@ -43,11 +54,15 @@ type Slower struct {
 }
 
 func NewSlower(next http.Handler, cnf *SlowerConfig) http.Handler {
-	return &Slower{
+	s := &Slower{
 		next:              next,
 		maxBytesPerSecond: cnf.MaxBytesPerSecond,
 		flushBytes:        cnf.FlushBytes,
 	}
+	if s.maxBytesPerSecond <= 0 {
+		s.maxBytesPerSecond = DefaultMaxBytesPerSecond
+	}
+	return s
 }
 
 func (s *Slower) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
