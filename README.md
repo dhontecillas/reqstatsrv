@@ -165,13 +165,30 @@ This content is here for testing purposes, and will surely be deleted on the
 
 ### Directory
 
-Will just serve the files that are set in the directory path
+Serve the files that are set in the directory path. The Content-Type for each
+file will be set according to the file extension. 
+
+With the `attempt_extensions` option, we can provide a list of file extensions
+to attempt when we cannot match directly the path to a file in the filesystem.
+Useful for example if we want to have a path like `/foo/bar/` to return a 
+json file (because the content-type is infered from the file extension), if 
+we add the `.json` file, it will try to find the `/foo/bar.json` file. This
+also allows to have a `/foo/bar/` dir in the filesystem, and put inside files
+like `/foo/bar/1`, `/foo/bar/2`, and have those inside the directory.
+
+With the `dunder_querystrings` option (`true` / `false`), sorts the query params alphabetically, and
+joins them after the file name using "dunder" (double underscore) separators
+between key, value pairs. Key Value pairs are split by using a single
+underscore. So a path like: /foo/bar?a=foo&b=bar will become:
+/foo/bar__a_foo__b_bar.
 
 ```json
 {
     "source": "directory",
     "config": {
-        "dir": "./example/data"
+        "dir": "./example/data",
+        "attempt_extensions": [".json", "yaml"],
+        "dunder_querystrings": true
     }
 }
 ```
