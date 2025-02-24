@@ -225,3 +225,51 @@ of requests served for each endpoint in the past second).
     "config": {}
 }
 ```
+
+### Proxy
+
+This content forwards the received request to another server 
+to retrieve the contents, allowing to apply behaviours to some
+existing endpoints (delay, slow sending of bytes, or change the
+status code).
+
+```json
+"content": {
+    "source": "proxy",
+    "config": {
+        "proxy_url": "http://127.0.0.1:9877"
+    }
+}
+```
+
+### Status Content Selector 
+
+This content allows to specify child contents depending on the 
+status code that the behaviour layer selected. This allows to 
+forward a request to the proxy if it is a successful status code,
+or fake it with some local file (or use empty response), for other
+status codes.
+
+```json
+"content": {
+    "source": "proxy",
+    "config": {
+        "default_content" : { 
+            "source": "proxy",
+            "config": {
+                "proxy_url": "http://127.0.0.1:9999"
+            }
+        },
+        "status_contents": [
+            "from": 500,
+            "to": 600,
+            "content": {
+                "source": "file",
+                "config": {
+                    "path": "./example/data/internal_server_error.json" 
+                }
+            }
+        ]
+    }
+}
+```

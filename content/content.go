@@ -19,6 +19,7 @@ var (
 		"dummy":                   DummyHandler,
 		"stats":                   StatsHandler,
 		"status_content_selector": StatusContentSelectorHandler,
+		"proxy":                   ProxyContentHandler,
 	}
 )
 
