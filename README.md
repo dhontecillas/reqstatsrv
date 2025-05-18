@@ -187,7 +187,7 @@ underscore. So a path like: /foo/bar?a=foo&b=bar will become:
     "source": "directory",
     "config": {
         "dir": "./example/data",
-        "attempt_extensions": [".json", "yaml"],
+        "attempt_extensions": ["json", "yaml"],
         "dunder_querystrings": true
     }
 }
