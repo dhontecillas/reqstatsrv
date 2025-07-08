@@ -3,13 +3,15 @@ package behaviour
 import (
 	"strings"
 	"testing"
+
+	"github.com/dhontecillas/reqstatsrv/config"
 )
 
 func TestBehaviourStatus_Happy(t *testing.T) {
 	s := StatusDistributorConfig{
-		CodeDistribution: map[int]float64{
-			200: 0.9,
-			500: 0.1,
+		CodeDistribution: config.IntDistribution{
+			config.IntFloat{Key: 200, Val: 0.9},
+			config.IntFloat{Key: 500, Val: 0.1},
 		},
 	}
 
@@ -22,7 +24,7 @@ func TestBehaviourStatus_Happy(t *testing.T) {
 
 func TestBehaviourStatus_FallbackToDefault(t *testing.T) {
 	s := StatusDistributorConfig{
-		CodeDistribution: map[int]float64{},
+		CodeDistribution: config.IntDistribution{},
 	}
 
 	err := s.Clean()
@@ -39,9 +41,9 @@ func TestBehaviourStatus_FallbackToDefault(t *testing.T) {
 
 func TestBehaviourStatus_Normalize(t *testing.T) {
 	s := StatusDistributorConfig{
-		CodeDistribution: map[int]float64{
-			200: 120,
-			500: 240,
+		CodeDistribution: config.IntDistribution{
+			config.IntFloat{Key: 200, Val: 120.0},
+			config.IntFloat{Key: 500, Val: 240.0},
 		},
 	}
 
@@ -51,12 +53,12 @@ func TestBehaviourStatus_Normalize(t *testing.T) {
 		return
 	}
 
-	v200 := s.CodeDistribution[200]
+	v200 := s.CodeDistribution[0].Val
 	if v200 <= 0.33 || v200 >= 0.34 {
 		t.Errorf("expected 200 value 0.3333.. got %f", v200)
 		return
 	}
-	v500 := s.CodeDistribution[500]
+	v500 := s.CodeDistribution[1].Val
 	if v500 <= 0.66 || v500 >= 0.67 {
 		t.Errorf("expected 200 value 0.6666.. got %f", v500)
 		return

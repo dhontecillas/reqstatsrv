@@ -74,5 +74,4 @@ func (d *StatusContentSelector) ServeHTTP(rw http.ResponseWriter, req *http.Requ
 		}
 	}
 	d.defaultContent.ServeHTTP(rw, req)
-	return
 }

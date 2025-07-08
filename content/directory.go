@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"path"
 	"slices"
+	"strings"
 
 	"github.com/dhontecillas/reqstatsrv/behaviour"
 	"github.com/dhontecillas/reqstatsrv/config"
@@ -96,7 +97,7 @@ func (c *DirectoryContent) dunderQueryFileName(basePath string, rawQuery string)
 	}
 	// sort the keys, to have a deterministing order
 	allKeys := make([]string, 0, len(values))
-	for k, _ := range values {
+	for k := range values {
 		allKeys = append(allKeys, k)
 	}
 	slices.Sort(allKeys)
@@ -117,6 +118,9 @@ func (c *DirectoryContent) dunderQueryFileName(basePath string, rawQuery string)
 func (c *DirectoryContent) findFile(req *http.Request) (http.File, error) {
 	// we remove the final `/` if present, and remove '..' / '.' path elements
 	p := path.Clean(req.URL.Path)
+	p = strings.TrimPrefix(p, c.parentPath)
+
+	// TODO remove the URL path prefix from the request to match the rest of the file
 
 	if dunderP := c.dunderQueryFileName(p, req.URL.RawQuery); dunderP != "" {
 		if f, err := c.openFile(dunderP); err == nil {

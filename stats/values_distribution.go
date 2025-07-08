@@ -51,7 +51,7 @@ func NewIntDistributionFromMap(m map[int]float64) *IntDistribution {
 	// in order to have interpolated values, we want the values
 	// sorted, so we can interpolate "values ramp"
 	sortedKeys := sort.IntSlice(make([]int, 0, len(nm)))
-	for k, _ := range nm {
+	for k := range nm {
 		sortedKeys = append(sortedKeys, k)
 	}
 	sort.Sort(sortedKeys)

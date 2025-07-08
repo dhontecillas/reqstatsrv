@@ -26,10 +26,10 @@ func Build(contentHandler http.Handler, behaviours []config.Behaviour) http.Hand
 			if h != nil {
 				next = h
 			} else {
-				fmt.Printf("cannot apply behaviour '%s'")
+				fmt.Printf("cannot apply behaviour %q\n", cfg.Name)
 			}
 		} else {
-			fmt.Printf("behavior builder '%s' not found: falling back to empty content\n")
+			fmt.Printf("behavior builder %q not found: falling back to empty content\n", cfg.Name)
 		}
 	}
 	return next

@@ -3,6 +3,7 @@ package behaviour
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -52,7 +53,7 @@ func (s *StatusDistributorConfig) Clean() error {
 	clean := make(config.IntDistribution, 0, len(s.CodeDistribution))
 	for _, kv := range s.CodeDistribution {
 		if kv.Val <= 0.0 {
-			errB.WriteString(fmt.Sprintf("invalid value %f for %d;", kv.Key, kv.Val))
+			errB.WriteString(fmt.Sprintf("invalid value %f for %d;", kv.Val, kv.Key))
 			continue
 		}
 
@@ -71,15 +72,18 @@ func (s *StatusDistributorConfig) Clean() error {
 
 	if len(clean) == 0 {
 		clean = []config.IntFloat{
-			config.IntFloat{Key: 200, Val: 1.0},
+			{Key: 200, Val: 1.0},
 		}
-		errB.WriteString(fmt.Sprintf("empty code distribution: falling back to 200 Ok always;"))
+		errB.WriteString("empty code distribution: falling back to 200 Ok always;")
 	}
+
+	s.CodeDistribution = clean
 
 	if errB.Len() == 0 {
 		return nil
 	}
-	return fmt.Errorf(errB.String())
+
+	return errors.New(errB.String())
 }
 
 type responseStatusType string
