@@ -57,6 +57,8 @@ type DirectoryContent struct {
 	dunderQueryStrings bool
 }
 
+// TODO: we should pass the route, so it can check how many path
+// components to skip
 func NewDirectoryContent(cfg *DirectoryContentConfig) http.Handler {
 	// the problem with FileServer is that the status code from
 	// the context is not respected
@@ -118,6 +120,7 @@ func (c *DirectoryContent) dunderQueryFileName(basePath string, rawQuery string)
 func (c *DirectoryContent) findFile(req *http.Request) (http.File, error) {
 	// we remove the final `/` if present, and remove '..' / '.' path elements
 	p := path.Clean(req.URL.Path)
+	fmt.Printf("\nDBG: p: %s, parentPath: %s\n", p, c.parentPath)
 	p = strings.TrimPrefix(p, c.parentPath)
 
 	// TODO remove the URL path prefix from the request to match the rest of the file

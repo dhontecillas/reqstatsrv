@@ -1,5 +1,5 @@
 {
-    "port": 9875,
+    "port": 9876,
     "host": "0.0.0.0",
     "autoreload": true,
     "endpoints": [
@@ -73,7 +73,8 @@
             "content": {
                 "source": "directory",
                 "config": {
-                    "dir": "./example/data"
+                    "dir": "./example/data",
+                    "endpoint_path": "/delayed/"
                 }
             }
         },
