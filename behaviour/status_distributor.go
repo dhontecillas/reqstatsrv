@@ -3,6 +3,7 @@ package behaviour
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -21,7 +22,7 @@ type StatusDistributorConfig struct {
 }
 
 func StatusDistributorConfigFromMap(m map[string]interface{}) *StatusDistributorConfig {
-	fmt.Printf("status distributor: %#v \n", m)
+	// fmt.Printf("status distributor: %#v \n", m)
 	var c StatusDistributorConfig
 	b, err := json.Marshal(m)
 	if err != nil {
@@ -32,7 +33,7 @@ func StatusDistributorConfigFromMap(m map[string]interface{}) *StatusDistributor
 	if err != nil {
 		fmt.Printf("error %s creating config from %s\n", err.Error(), string(b))
 	}
-	fmt.Printf("status distributor parsed: %#v \n", c)
+	// fmt.Printf("status distributor parsed: %#v \n", c)
 	c.Clean()
 	return &c
 }
@@ -52,7 +53,7 @@ func (s *StatusDistributorConfig) Clean() error {
 	clean := make(config.IntDistribution, 0, len(s.CodeDistribution))
 	for _, kv := range s.CodeDistribution {
 		if kv.Val <= 0.0 {
-			errB.WriteString(fmt.Sprintf("invalid value %f for %d;", kv.Key, kv.Val))
+			errB.WriteString(fmt.Sprintf("invalid value %f for %d;", kv.Val, kv.Key))
 			continue
 		}
 
@@ -71,15 +72,18 @@ func (s *StatusDistributorConfig) Clean() error {
 
 	if len(clean) == 0 {
 		clean = []config.IntFloat{
-			config.IntFloat{Key: 200, Val: 1.0},
+			{Key: 200, Val: 1.0},
 		}
-		errB.WriteString(fmt.Sprintf("empty code distribution: falling back to 200 Ok always;"))
+		errB.WriteString("empty code distribution: falling back to 200 Ok always;")
 	}
+
+	s.CodeDistribution = clean
 
 	if errB.Len() == 0 {
 		return nil
 	}
-	return fmt.Errorf(errB.String())
+
+	return errors.New(errB.String())
 }
 
 type responseStatusType string

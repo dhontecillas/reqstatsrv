@@ -17,6 +17,6 @@ type EmptyPayload struct {
 func (d *EmptyPayload) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	h := rw.Header()
 	h.Add("Content-Length", "0")
-	rw.WriteHeader(behaviour.ResponseStatusOr(req, 200))
-	return
+	// if there is no content, the default http status code should be 204
+	rw.WriteHeader(behaviour.ResponseStatusOr(req, http.StatusNoContent))
 }

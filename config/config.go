@@ -9,6 +9,7 @@ type Config struct {
 	Host       string     `json:"host"`        //
 	RandomSeed int64      `json:"random_seed"` // value to get reproducible results
 	Endpoints  []Endpoint `json:"endpoints"`
+	Autoreload bool       `json:"autoreload"`
 }
 
 func (c *Config) Addr() string {

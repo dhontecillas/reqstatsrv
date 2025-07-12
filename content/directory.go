@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"path"
 	"slices"
+	"strings"
 
 	"github.com/dhontecillas/reqstatsrv/behaviour"
 	"github.com/dhontecillas/reqstatsrv/config"
@@ -56,6 +57,8 @@ type DirectoryContent struct {
 	dunderQueryStrings bool
 }
 
+// TODO: we should pass the route, so it can check how many path
+// components to skip
 func NewDirectoryContent(cfg *DirectoryContentConfig) http.Handler {
 	// the problem with FileServer is that the status code from
 	// the context is not respected
@@ -96,7 +99,7 @@ func (c *DirectoryContent) dunderQueryFileName(basePath string, rawQuery string)
 	}
 	// sort the keys, to have a deterministing order
 	allKeys := make([]string, 0, len(values))
-	for k, _ := range values {
+	for k := range values {
 		allKeys = append(allKeys, k)
 	}
 	slices.Sort(allKeys)
@@ -117,6 +120,10 @@ func (c *DirectoryContent) dunderQueryFileName(basePath string, rawQuery string)
 func (c *DirectoryContent) findFile(req *http.Request) (http.File, error) {
 	// we remove the final `/` if present, and remove '..' / '.' path elements
 	p := path.Clean(req.URL.Path)
+	fmt.Printf("\nDBG: p: %s, parentPath: %s\n", p, c.parentPath)
+	p = strings.TrimPrefix(p, c.parentPath)
+
+	// TODO remove the URL path prefix from the request to match the rest of the file
 
 	if dunderP := c.dunderQueryFileName(p, req.URL.RawQuery); dunderP != "" {
 		if f, err := c.openFile(dunderP); err == nil {

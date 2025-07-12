@@ -1,0 +1,9 @@
+{
+    "products": [
+        {
+            "prod_id": 127,
+            "name": "shoes",
+            "description": "black italian shoes"
+        }
+    ]
+}

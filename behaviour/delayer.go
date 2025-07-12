@@ -51,7 +51,8 @@ func NewDelayer(next http.Handler, cfg *DelayerConfig) http.Handler {
 
 func (d *Delayer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	delayMillis := d.distrInstance.GetInterpolated()
-	fmt.Printf("delaying %d millis\n", delayMillis)
+	// TODO: should we log this ?
+	// fmt.Printf("delaying %d millis\n", delayMillis)
 	time.Sleep(time.Millisecond * time.Duration(delayMillis))
 	d.next.ServeHTTP(rw, r)
 }
