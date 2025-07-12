@@ -22,7 +22,7 @@ type StatusDistributorConfig struct {
 }
 
 func StatusDistributorConfigFromMap(m map[string]interface{}) *StatusDistributorConfig {
-	fmt.Printf("status distributor: %#v \n", m)
+	// fmt.Printf("status distributor: %#v \n", m)
 	var c StatusDistributorConfig
 	b, err := json.Marshal(m)
 	if err != nil {
@@ -33,7 +33,7 @@ func StatusDistributorConfigFromMap(m map[string]interface{}) *StatusDistributor
 	if err != nil {
 		fmt.Printf("error %s creating config from %s\n", err.Error(), string(b))
 	}
-	fmt.Printf("status distributor parsed: %#v \n", c)
+	// fmt.Printf("status distributor parsed: %#v \n", c)
 	c.Clean()
 	return &c
 }

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/dhontecillas/reqstatsrv/config"
@@ -27,6 +28,24 @@ type HTTPServer struct {
 	srv        *http.Server
 }
 
+func setupWatcher(configFile string) *fsnotify.Watcher {
+	var err error
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		fmt.Printf("cannot autoreload: %s\n", err.Error())
+		return nil
+	}
+	// we watch the directory
+	absCfgFile, err := filepath.Abs(configFile)
+	if err != nil {
+		fmt.Printf("cannot get absolute path for config file")
+		watcher.Close()
+		return nil
+	}
+	watcher.Add(filepath.Dir(absCfgFile))
+	return watcher
+}
+
 func NewHTTPServer(ctx context.Context, configFile string) (*HTTPServer, error) {
 	cfg, err := LoadConfig(configFile)
 	if err != nil {
@@ -35,12 +54,7 @@ func NewHTTPServer(ctx context.Context, configFile string) (*HTTPServer, error) 
 
 	var watcher *fsnotify.Watcher
 	if cfg.Autoreload {
-		var err error
-		watcher, err = fsnotify.NewWatcher()
-		if err != nil {
-			fmt.Printf("cannot autoreload: %s\n", err.Error())
-		}
-		watcher.Add(configFile)
+		watcher = setupWatcher(configFile)
 	}
 
 	srv, err := newServer(cfg)
@@ -78,14 +92,18 @@ func (s *HTTPServer) backgroundWatch() {
 	for {
 		select {
 		case event, ok := <-s.watcher.Events:
+			// fmt.Printf("\nEVENT\n%s\n", event.String())
 			if !ok {
 				fmt.Printf("\ncannot continue watching the config file\n")
 				return
 			}
-			if event.Has(fsnotify.Rename) || event.Has(fsnotify.Remove) {
-				time.Sleep(500 * time.Millisecond)
-				s.watcher.Add(s.configFile)
+			if filepath.Base(event.Name) != filepath.Base(s.configFile) {
+				continue
 			}
+			if !event.Has(fsnotify.Write) {
+				continue
+			}
+			time.Sleep(100 * time.Millisecond)
 			if err := s.reload(); err != nil {
 				fmt.Printf("cannot launch new config %q: %s\nOp: %d -> %q",
 					s.configFile, err.Error(), event.Op, event.Name)
