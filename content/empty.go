@@ -7,7 +7,7 @@ import (
 	"github.com/dhontecillas/reqstatsrv/config"
 )
 
-func EmptyContentHandler(cfg *config.Content, nestedBuilder NestedContentBuilderFn) http.Handler {
+func EmptyContentHandler(_ *config.Endpoint, cfg *config.Content) http.Handler {
 	return &EmptyPayload{}
 }
 

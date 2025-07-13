@@ -7,7 +7,7 @@ import (
 	"github.com/dhontecillas/reqstatsrv/config"
 )
 
-func DummyHandler(cfg *config.Content, nestedBuilder NestedContentBuilderFn) http.Handler {
+func DummyHandler(_ *config.Endpoint, cfg *config.Content) http.Handler {
 	return &DummyPayload{}
 }
 

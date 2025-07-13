@@ -10,9 +10,13 @@ import (
 )
 
 func Bind(mux *http.ServeMux, cfg *config.Endpoint) {
-	ch := content.Build(&cfg.Content)
+	ch := content.Build(cfg, &cfg.Content)
 	h := behaviour.Build(ch, cfg.Behaviour)
 
 	s := stats.NewStatsMiddleware(h, cfg.PathPattern, nil, nil)
-	mux.Handle(cfg.PathPattern, s)
+	if cfg.Method == "" {
+		mux.Handle(cfg.PathPattern, s)
+	} else {
+		mux.Handle(cfg.Method+" "+cfg.PathPattern, s)
+	}
 }

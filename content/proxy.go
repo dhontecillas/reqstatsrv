@@ -10,7 +10,7 @@ import (
 	"github.com/dhontecillas/reqstatsrv/config"
 )
 
-func ProxyContentHandler(cfg *config.Content, nestedBuilder NestedContentBuilderFn) http.Handler {
+func ProxyContentHandler(_ *config.Endpoint, cfg *config.Content) http.Handler {
 	return NewProxyContent(ProxyContentConfigFromMap(cfg.Config))
 }
 

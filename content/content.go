@@ -9,10 +9,11 @@ import (
 
 type NestedContentBuilderFn func(c *config.Content) http.Handler
 
-type ContentHandlerBuilderFn func(c *config.Content, nestedBuilder NestedContentBuilderFn) http.Handler
+type ContentHandlerBuilderFn func(endpointCfg *config.Endpoint,
+	c *config.Content) http.Handler
 
-var (
-	contentBuilders = map[string]ContentHandlerBuilderFn{
+func Build(eCfg *config.Endpoint, cfg *config.Content) http.Handler {
+	contentBuilders := map[string]ContentHandlerBuilderFn{
 		"directory":               DirectoryContentHandler,
 		"file":                    FileContentHandler,
 		"empty":                   EmptyContentHandler,
@@ -21,11 +22,8 @@ var (
 		"status_content_selector": StatusContentSelectorHandler,
 		"proxy":                   ProxyContentHandler,
 	}
-)
-
-func Build(cfg *config.Content) http.Handler {
 	if b, ok := contentBuilders[cfg.Source]; ok {
-		h := b(cfg, Build)
+		h := b(eCfg, cfg)
 		if h != nil {
 			return h
 		}

@@ -14,8 +14,10 @@ import (
 	"github.com/dhontecillas/reqstatsrv/config"
 )
 
-func DirectoryContentHandler(cfg *config.Content, nestedBuilder NestedContentBuilderFn) http.Handler {
-	return NewDirectoryContent(DirectoryContentConfigFromMap(cfg.Config))
+func DirectoryContentHandler(eCfg *config.Endpoint,
+	cfg *config.Content) http.Handler {
+
+	return NewDirectoryContent(eCfg, DirectoryContentConfigFromMap(cfg.Config))
 }
 
 // DirectoryContentConfig allows to define how to find the fake files
@@ -31,7 +33,6 @@ func DirectoryContentHandler(cfg *config.Content, nestedBuilder NestedContentBui
 // /foo/bar__a_foo__b_bar
 type DirectoryContentConfig struct {
 	Dir                string   `json:"dir"`
-	EndpointPath       string   `json:"endpoint_path"`
 	AttemptExtensions  []string `json:"attempt_extensions"`
 	DunderQueryStrings bool     `json:"dunder_querystrings"`
 }
@@ -52,19 +53,24 @@ func DirectoryContentConfigFromMap(m map[string]interface{}) *DirectoryContentCo
 
 type DirectoryContent struct {
 	dir                http.Dir
-	parentPath         string
+	numSkipDirs        int
 	attemptExtensions  []string
 	dunderQueryStrings bool
 }
 
 // TODO: we should pass the route, so it can check how many path
 // components to skip
-func NewDirectoryContent(cfg *DirectoryContentConfig) http.Handler {
+func NewDirectoryContent(eCfg *config.Endpoint, cfg *DirectoryContentConfig) http.Handler {
 	// the problem with FileServer is that the status code from
 	// the context is not respected
+	comps := strings.Split(eCfg.PathPattern, "/")
+	n := len(comps)
+	if comps[n-1] == "" {
+		n -= 1
+	}
 	return &DirectoryContent{
 		dir:                http.Dir(cfg.Dir),
-		parentPath:         cfg.EndpointPath,
+		numSkipDirs:        n,
 		attemptExtensions:  cfg.AttemptExtensions,
 		dunderQueryStrings: cfg.DunderQueryStrings,
 	}
@@ -120,10 +126,12 @@ func (c *DirectoryContent) dunderQueryFileName(basePath string, rawQuery string)
 func (c *DirectoryContent) findFile(req *http.Request) (http.File, error) {
 	// we remove the final `/` if present, and remove '..' / '.' path elements
 	p := path.Clean(req.URL.Path)
-	fmt.Printf("\nDBG: p: %s, parentPath: %s\n", p, c.parentPath)
-	p = strings.TrimPrefix(p, c.parentPath)
-
-	// TODO remove the URL path prefix from the request to match the rest of the file
+	pComps := strings.Split(p, "/")
+	if len(pComps) < c.numSkipDirs {
+		p = ""
+	} else {
+		p = strings.Join(pComps[c.numSkipDirs:], "/")
+	}
 
 	if dunderP := c.dunderQueryFileName(p, req.URL.RawQuery); dunderP != "" {
 		if f, err := c.openFile(dunderP); err == nil {

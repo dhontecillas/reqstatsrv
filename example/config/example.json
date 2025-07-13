@@ -43,7 +43,7 @@
         },
         {
             "method": "GET",
-            "path_pattern": "/delayed/",
+            "path_pattern": "/delayed/{foo}/bar/",
             "behaviour": [
                 {
                     "name": "delayer",

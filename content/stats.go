@@ -10,7 +10,7 @@ import (
 	"github.com/dhontecillas/reqstatsrv/stats"
 )
 
-func StatsHandler(cfg *config.Content, nestedBuilder NestedContentBuilderFn) http.Handler {
+func StatsHandler(_ *config.Endpoint, cfg *config.Content) http.Handler {
 	return &CounterPayloadHandler{}
 }
 
