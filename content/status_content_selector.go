@@ -9,8 +9,8 @@ import (
 	"github.com/dhontecillas/reqstatsrv/config"
 )
 
-func StatusContentSelectorHandler(cfg *config.Content, nestedBuilder NestedContentBuilderFn) http.Handler {
-	return NewStatusContentSelector(StatusSelectorConfigFromMap(cfg.Config), nestedBuilder)
+func StatusContentSelectorHandler(eCfg *config.Endpoint, cfg *config.Content) http.Handler {
+	return NewStatusContentSelector(eCfg, StatusSelectorConfigFromMap(cfg.Config))
 }
 
 type StatusRangeContent struct {
@@ -50,16 +50,16 @@ type StatusContentSelector struct {
 	ranges         []contentByStatusRange
 }
 
-func NewStatusContentSelector(cfg *StatusContentSelectorConfig, nestedBuilder NestedContentBuilderFn) *StatusContentSelector {
+func NewStatusContentSelector(eCfg *config.Endpoint, cfg *StatusContentSelectorConfig) *StatusContentSelector {
 	s := &StatusContentSelector{
-		defaultContent: nestedBuilder(&cfg.DefaultContent),
+		defaultContent: Build(eCfg, &cfg.DefaultContent),
 		ranges:         make([]contentByStatusRange, 0, len(cfg.StatusContents)),
 	}
 	for _, rg := range cfg.StatusContents {
 		s.ranges = append(s.ranges, contentByStatusRange{
 			from: rg.From,
 			to:   rg.To,
-			next: nestedBuilder(&rg.Content),
+			next: Build(eCfg, &rg.Content),
 		})
 	}
 	return s

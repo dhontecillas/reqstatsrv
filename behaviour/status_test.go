@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/dhontecillas/reqstatsrv/config"
+	"github.com/dhontecillas/reqstatsrv/stats"
 )
 
 func TestBehaviourStatus_Happy(t *testing.T) {
@@ -53,14 +54,15 @@ func TestBehaviourStatus_Normalize(t *testing.T) {
 		return
 	}
 
-	v200 := s.CodeDistribution[0].Val
-	if v200 <= 0.33 || v200 >= 0.34 {
-		t.Errorf("expected 200 value 0.3333.. got %f", v200)
+	distr := stats.NewIntDistribution(s.CodeDistribution)
+	v200 := distr.Val(0.32)
+	if v200 != 200 {
+		t.Errorf("expected 200 value 0.3333.. got %d", v200)
 		return
 	}
-	v500 := s.CodeDistribution[1].Val
-	if v500 <= 0.66 || v500 >= 0.67 {
-		t.Errorf("expected 200 value 0.6666.. got %f", v500)
+	v500 := distr.Val(0.34)
+	if v500 != 500 {
+		t.Errorf("expected 200 value 0.6666.. got %d", v500)
 		return
 	}
 }

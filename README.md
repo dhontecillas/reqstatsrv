@@ -1,12 +1,17 @@
 # ReqStatSrv
 
-A dummy server that reports the number of requests made.
+An http server to for **fake responses with weird
+behaviours**: delayed responses, connection cuts,
+slow responses...
 
 ## Usage:
 
 ```bash
-docker pull dhontecillas/reqstatsrv:v0.2
-docker run --rm -p 9876:9876 -v ./example:/etc/reqstatsrv dhontecillas/reqstatsrv:v0.2  /reqstatsrv /etc/config/example.json
+docker pull dhontecillas/reqstatsrv:v0.4
+docker run --rm -p 9876:9876 \
+    -v ./example:/etc/reqstatsrv \
+    dhontecillas/reqstatsrv:v0.4 \
+    /reqstatsrv /etc/config/example.json
 ```
 
 or from the base repo run:
@@ -15,14 +20,11 @@ or from the base repo run:
 make dockerrun
 ```
 
+## Example: 
+
 # Configuration
 
-The server uses the Go's standard lib router, so, for now it does not
-have variable path matching (`/foo/{something_to_match}/var`), or 
-matching by request method (`GET`, `POST`, etc..) for now (but a new 
-router implementation is expected to land soon in next version of Go).
-
-The server can be configured by passing a **JSON** config file as only
+The server is be configured using **JSON** config file as the only
 argument.
 
 At the root level, you can configure:
@@ -30,14 +32,17 @@ At the root level, you can configure:
 - `host`: the address to bind to 
 - `endpoints`: the list of endpoints to serve
 
-## Enpoint
+
+## Endpoint
 
 The endpoint has:
 
-- `method`: currently is not used to match the request, as we
-    are waiting for the new Go router to land in the stdlib.
-- `path_pattern`: a simple "path prefix" to match (no vars, nor
-    wildcards allowed for now). 
+- `method`: an uppercased http method: 'GET', 'POST', ...
+- `path_pattern`: The server uses the Go's standard lib router, so, 
+    to define a route you can follow the 
+    [patterns documentation](https://pkg.go.dev/net/http#hdr-Patterns-ServeMux),
+    with the slight difference that the method is specified in the
+    `method` field.
 - `behaviour`: configuration about how we want the response to
     behave (see explanation below).
 - `content`: configuration about the content to serve with the

@@ -10,7 +10,7 @@ import (
 	"github.com/dhontecillas/reqstatsrv/config"
 )
 
-func FileContentHandler(cfg *config.Content, nestedBuilder NestedContentBuilderFn) http.Handler {
+func FileContentHandler(_ *config.Endpoint, cfg *config.Content) http.Handler {
 	return NewFileContent(FileContentConfigFromMap(cfg.Config))
 }
 
