@@ -1,6 +1,6 @@
 # ReqStatSrv
 
-An http server to for **fake responses with weird
+An http server for **fake responses with weird
 behaviours**: delayed responses, connection cuts,
 slow responses...
 

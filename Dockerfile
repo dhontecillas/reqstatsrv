@@ -1,4 +1,4 @@
-FROM golang:1.21.6-bullseye as builder
+FROM golang:1.24.5-bullseye as builder
 
 COPY . /go/src/github.com/dhontecillas/reqstatsrv
 WORKDIR /go/src/github.com/dhontecillas/reqstatsrv
