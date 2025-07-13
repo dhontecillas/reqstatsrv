@@ -31,6 +31,9 @@ At the root level, you can configure:
 - `port`: the binding port
 - `host`: the address to bind to 
 - `endpoints`: the list of endpoints to serve
+- `auto_reload`: a boolean, indicating if we want to watch
+    the config file for changes and relaunch the server
+    if there is some write.
 
 
 ## Endpoint
